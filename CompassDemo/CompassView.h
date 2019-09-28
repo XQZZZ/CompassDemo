@@ -1,9 +1,9 @@
 //
 //  CompassView.h
-//  SYCompassDemo
+//  CompassDemo
 //
-//  Created by 陈蜜 on 16/6/27.
-//  Copyright © 2016年 sunyu. All rights reserved.
+//  Created by Xhorse on 2019/9/28.
+//  Copyright © 2019 Xhorse. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
