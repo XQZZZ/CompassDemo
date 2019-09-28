@@ -8,6 +8,7 @@
 
 #import "CompassView.h"
 #import "SensorManager.h"
+#import <AudioToolbox/AudioToolbox.h>
 
 #define defaultRadius 100
 
@@ -22,6 +23,7 @@
 @property (nonatomic, strong) CAShapeLayer *shapeLayer;
 
 @property (nonatomic, strong) SensorManager *manager;
+@property (nonatomic, assign) BOOL isSound;
 
 @end
 
@@ -35,6 +37,7 @@
     if (self = [super initWithFrame:frame]) {
         _point = CGPointMake(frame.size.width/2, frame.size.height/2);
         _scale = radius/100;
+         self.isSound = YES;
         [self customUI];
         [self startSensor];
     }
@@ -121,23 +124,23 @@
         
         if (data.gravity.x > 0) {
             if (data.gravity.x * 100 >= 30) {
-                horizontalX = _point.x - 30;
+                horizontalX = mySelf.point.x - 30;
             } else {
-                horizontalX = _point.x - data.gravity.x * 100;
+                horizontalX = mySelf.point.x - data.gravity.x * 100;
             }
         } else {
             if (fabsf >= 30) {
-                horizontalX = _point.x + 30;
+                horizontalX = mySelf.point.x + 30;
             } else {
-                horizontalX = _point.x +fabsf;
+                horizontalX = mySelf.point.x +fabsf;
             }
         }
         if (data.gravity.y * 100 >= 30) {
-            horizontalY = _point.y + 30;
+            horizontalY = mySelf.point.y + 30;
         } else if (data.gravity.y * 100 <= -30) {
-            horizontalY = _point.y - 30;
+            horizontalY = mySelf.point.y - 30;
         } else {
-            horizontalY = _point.y + data.gravity.y * 100;
+            horizontalY = mySelf.point.y + data.gravity.y * 100;
         }
         NSLog(@"x == %f; y == %f", horizontalX, horizontalY);
 
@@ -161,14 +164,20 @@
         if (isMiddleRect) {
             mySelf.horizontalColor = [UIColor greenColor];
             mySelf.shapeLayer.strokeColor = [UIColor greenColor].CGColor;
+            if (mySelf.isSound) {
+                AudioServicesPlaySystemSound(kSystemSoundID_Vibrate); // 手机振动
+                mySelf.isSound = NO;
+            }
         } else {
             mySelf.horizontalColor = [UIColor redColor];
             mySelf.shapeLayer.strokeColor = [UIColor redColor].CGColor;
+            mySelf.isSound = YES;
         }
     };
     [_manager startGyroscope];
 }
 
+// 判断一个点是否在某个指定区域
 - (BOOL)point:(CGPoint)point inCircleRect:(CGRect)rect {
     CGFloat radius = rect.size.width/2.0;
     CGPoint center = CGPointMake(rect.origin.x + radius, rect.origin.y + radius);
